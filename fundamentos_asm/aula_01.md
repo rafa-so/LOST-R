@@ -22,10 +22,49 @@
 ## Ferrametas
 - Editor de texto: VIM
 - Montador (assembler): NASM
-- Linkador (linker): GNU id
+- Linkador (linker): GNU ld
 - Compilador: GNU GCC
 - Makefiles: GNU MAKE
 - Depurador: GNU debugger (GDB)
 
 - Editor hexadecimal: hexeditor
 - Hex Editor: xxd
+
+## Código de operação
+código que é usado pela máquina para executar as suas próprias operações
+
+```asm
+    MOV EAX, 1
+    MOV EBX, 0
+```
+é um exemplo de código de operação. Neste exemplo estaria passando o número 1 para o registrador EAX e o número 0 para o EBX.
+
+Em código de máquina seria:
+```
+MOV EAX = b8
+1       = 01 00 00 00 (Little ending)
+MOV EBX = bb
+0       = 00 00 00 00
+```
+
+> Diferente de endereço de memória registrador tem nome. 
+
+## O que é assembly?
+
+É uma linguagem de montagem, que permite humanos entenderem a linguagem de máquina.
+
+### Linguagem de montagem (Assembly)
+- Nomes para instruções da CPU
+- Nomes para registradores da CPU
+- Rótulos para endereços da memória
+- Dados como números
+
+### Montador (Assembler)
+- Produz arquivos binários (objeto)
+- Código do programa
+- Dados utilizados pelo ligador
+
+### Ligador (Linker)
+- Gera binários executáveis
+- Organiza seções e símbolos
+
