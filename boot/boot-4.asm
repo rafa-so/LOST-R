@@ -8,6 +8,7 @@ main:
 
     mov ss, ax
     mov sp, 0x7c00
+    halt
 
 print_msg:
     mov ah, 0x0e
