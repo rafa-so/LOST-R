@@ -83,3 +83,37 @@ A `string` não teria apenas 7 bytes, e sim 9, pois `ç` e `ã` temos 2 bytes ca
 ---
 
 #### Pseudo-instrução 'db'
+Esta instrução tem como objetivo definir uma cadeia de caracteres. Ela é uma simplificação de `Define Bytes`. Existe as subvariações da mesma, que em arquitetura x86_64 podemos definir cadeias de palavas, `dw`, cadeias de palavras duplas, `dd`, cadeia de palavras quaduplas, `dq` e assim sucessivamente. Nesta arquitetura as palavras terão de 2, 4 a 8 bytes de comprimento. 
+
+Quanto maior os bytes, maior vai ser o binário, pois isso afeta diretamente a quantidade de bytes.
+
+```asm
+    db "Salve, Simpatia!"
+```
+
+Neste contexto estou definido uma cadeia de bytes, que vai ter exatamente o tamanho da `string`. Até por que também não tenho caracteres fora da tablela ASCII nesta `string`.
+
+#### Tamanho da Mensagem
+As cadeias de bytes são definidas na memória de forma sequencial de forma que o rótulo representa o início da cadeia e o caracter `$` representa sempre o local do último valor escrito. Para entendermos o tamanho da cadeia precisamos sempre recorrer a subtração (rótulo - último byte) como por exemplo:
+
+```asm
+    msg: db "salve", 10
+
+    len: equ $ - msg
+```
+
+Neste momento tenho um rótulo com uma cadeia de 6 bytes. Sendo mais específico o `rótulo` na verdade apontaria para o início da cadeia. Já o `$` aponta para o último endereço ocupado na memória. Esta `len` já seria pré processada pelo `ld`, ou o linker que for, com o valor da subtração entre estes termos.
+
+Um detalhe interessante é que esta operação deve ser feita sempre que se definir uma cadeia de caracter. Pois elas são guardadas em memória de forma sequencial, e o `$` é sempre o último endereço ocupado, não importa que cadeia seja. 
+
+> sempre que definir uma nova string, deverá ser feita essa operação de length
+
+Este detalhe do tamanho é importante, pois tenhos que já saber o tamanho dessa cadeia para manipular ela pelo código.
+
+#### Pseudo instrução 'equ'
+Esta pseudo-instrução ela é processada, no momento da linkagem, tornando o valor absoluto, ou constante na execução do software.
+
+## Source
+O código fonte asm nada mais é do que manipulação de valores em memória, além de manipulação de registradores na CPU.
+
+### Registradores
