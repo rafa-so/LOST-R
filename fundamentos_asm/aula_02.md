@@ -24,6 +24,8 @@ São blocos de código usados para definir informações para o programa que vai
 |.data| Esta seção é responsável por agrupar as "variáveis" que queremos inicializar. Na verdade ela é resonsável por agrupar o espaço de memória que queremos já injetar valor. Neste contexto aqui também elas são usadas mais como constantes propriamente ditas. Como valores fixos não variáveis.|
 |.bss| Esta seção é justamente o contrário da *.data*, ela é responsável por agrupar as "variáveis" (ou espaço de memória) que não queremos por enquanto inicializar. Vem de *Block Starting Symbol*|
 
+Relativo a seção _start, ela está presente no binário, e é normalmente usada para informar ao linkeditor o entrypoint do programa. Isso, é uma convensão usada por padrão pelo próprio `ld`. Caso necessite mudar, é passar o parâmetro `-e` passando o nome do entrypoint para o `ld`.
+
 ==O nome dessas seções já estão pré definidas pelo NASM==
 ****
 Estas seções acima são as seções padrões do NASm, mas pode-se criar quantas seções quisermos, com o nome que quisermos também. Estas seções padrão são as que tem seus parâmetros configurados pelo **assemblador**.
@@ -35,3 +37,14 @@ Segmentos de dados são muitas vezes intercambiáveis com as seções. Elas tamb
 ==Processos não são software em execução, são estruturas de dados==
 
 ![layout de memória](https://i.imgur.com/eyK4MZM.png)
+
+### Chamadas de Sistema
+São métodos para acessar funcionalidades do Kernel. 
+
+Estas chamadas são definidas em libs de C padrão `libc` (UNIX) ou `glibc` (GNU/LINUX).
+
+As convensões de chamadas de sistema são especificadas pela *Interface de Abstraçao Binária* (ABI), que determina quais registradores deverão receber os argumentos de cada chamada de sistema.
+
+Na arquitetura x86_64, as chamadas de sistema são executadas pela instrução `Syscall`.
+
+Na arquitetura x86 as chamadas de sistema são executadas pela instrução `int 0x80`.
