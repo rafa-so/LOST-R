@@ -117,3 +117,108 @@ Esta pseudo-instrução ela é processada, no momento da linkagem, tornando o va
 O código fonte asm nada mais é do que manipulação de valores em memória, além de manipulação de registradores na CPU.
 
 ### Registradores
+Registradores é uma memória para uso exclusivo do processador. No caso de registradores de uso geral, podemos usar as suas subdivisões de 32, 16 e 8 bits. No caso da arquitetura x86_64, podemos armazenar até 64 bits de espaço, ou seja, 8 bytes. 
+
+Com relação as subdivisões, temos o registrador `rax` que podemos acessar usando os seguintes nomes: `eax` (16 bits), `ax` (8 bits) (`ah` e `al`). Ainda com subdivisões, temos a parte alta (high) do registrador (`Xh`) e a parte baixa (`Xl`), sendo `X` a respectiva letra do registrador. Estas partes de 4 bits, vão ser usadas para as mais diversas operações pelo programa.
+
+Muitos outros registradores também seguem esse padrão de nomes para as mais diversas porções de 32, 16 e 8 btis. Isso permite retro compatibilidade com outros arquiteturas.
+
+#### Instruções
+As instruções são *mneumônicos* que facilitam o uso de certas operações com o processador, sem isso, teríamos que saber exatamente o código de máquina para realizar as operações com a própria CPU. Estas operações seriam exatamente operações com os registradores e memória.
+
+Para cada instrução há três possibilidades de operandos , chamados de *modo de direcionamento* (adderessing mode).
+
+##### Registradores
+ - Registradores de propósito geral (`rax`, `rbx`, `rcx`, `rdx` ...)
+ - Registradores de índice (`rdi`, `rsi`, `rsp`, `rdp`)
+ - Registradores de inteiros (`r8`, `r15`)
+
+##### MOV
+Instrução que copia dados entre registradores e endereços de memória
+
+##### SYSCALL
+Instrução que chama operações do sistema operacional, conforme dados copiados a certos registradores. Existe uma convenção de registradores para cada tipo de chamada ao sistema.
+
+## Chamadas de Sistema
+Como comentadado na seção imediatamente anterior, é a chamada do nosso sistema a operações específicas que são controladas pelo kernel:
+
+- Manipulações de Arquivos
+- Ler ou escrever dados em dispositivos de entrada e saída de dados
+- Alocar espaço em memória
+- Iniciar e terminar processos
+
+Tratando-se de `syscalls` a ordem que que atribuimos os `registradores` não importa, no entanto, se trabalhamos com C/C++ é preciso respeitar ainda outros padrões previstos na `ABI`.
+
+---
+
+## Apresentação de caracteres na tela
+
+Para este tipo de impressão é importante usar a `syscall` que é usada para escrever em arquivos. Para sistemas baseados em `UNIX` tudo tem representação em forma de arquivo incluindo o próprio hardware.
+
+Dessa forma, o `/dev/stdout` é representação em arquivo do terminal. É dita também é a saída padrão. Esta saída padrão está disponível para escrita através de outro arquivo chamado *descritor de arquivos (FD)*. 
+
+São links simbólicos que o kernel disponibiliza para processos manipularem arquivos. Por padrão existem três:
+
+|FD|Dispositivo|Descrição|
+|--|-----------|---------|
+|0|`/dev/stdin`|Entrada Padrão (Teclado)|
+|1|`/dev/stdout`|Saída Padrão (Display do terminal)|
+|2|`/dev/tsderr`|Saída Padrão (Erro no display do terminal)|
+
+> Estes descritores, dependendo do contexto, também podem ser chamdados de *File Handlers*.
+
+### Escrita em tela
+```asm
+    mov rax, 1   ; Chamada de sistema `sys_write`
+    mov rdi, 1   ; Descritor de arquivo (FD, stdout - Saída padrão)
+    mov rsi, msg ; Ponteiro para a `string` que está em memória 
+    mov rdx, len ; Constante com o tamanho da string
+    syscall      ; Invoca a chamada do sistema
+                 ; com os dados nos registradores
+```
+Aqui temos a operação para parametrizar uma chamada do sistema `sys_write`. 
+```asm
+    mov rax, 1
+```
+
+O `rax` é um registrador para uso geral e é parametrizando nele o valor `1` que conseguimos depois invocar a `syscall` correspondente a escrita na saída padrão. 
+
+Precisamos definir o descritor de arquivo que vamos usar. No nosso caso é o 1, que é a saída padrão mesmo.
+```asm
+    mov rdi, 1
+```
+
+Apontaremos para a constante de `string` que temos neste caso. A ideia aqui é ser pedagógico, mas teremos mais dinamicidade depois.
+```asm
+    mov rsi, msg
+```
+Repare que `msg` é um rótulo que aponta exatamente para o início da string que o corresponde. Este rótulo tem que já estar presente em outra seção prévia.
+
+É necessário também explicitarmos o tamanho que esta cadeia de caracter terá
+```asm
+    mov rdx, len
+```
+Repare, que conforme outros exemplos, `len`vai ser pré processado pelo `ld`, e no binário, `len` vai ser o próprio número de bytes. Esta operação não vai existir dentro do binário.
+
+Tudo arrumado e explicitado, chamamos a operação no kernel
+```asm
+    syscall
+```
+
+### Terminando a aplicação
+Para teminar de forma organizada, temos que parametrizar a operação.
+```asm
+    mov rax, 60
+```
+Esta chama já indica que quero chamar o `sys_exit`, para terminar este processo.
+
+Preciso informar um "status" de sucesso. É com este código que o `SO` vai julgar se o programa foi bem finalizado ou não.
+```asm
+    mov rdi, 0
+```
+
+Qualquer coisa acima de `0` e entre `255`, o SO julgará que o processo não foi bem encerrado. Por padrão, quando o programa for encerrado com sucesso, ele ter que retornar `0`.
+
+Por fim executar a chamada para o kernal através do `syscall`.
+
+---
