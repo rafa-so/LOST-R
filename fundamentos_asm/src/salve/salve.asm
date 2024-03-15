@@ -20,3 +20,6 @@ _start:                          ; Aqui está o início do programa
                                  ; dados nos Registradores
 
 _end:
+    mov rax, 60
+    mov rdi, 0
+    syscall
