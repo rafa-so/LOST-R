@@ -5,5 +5,5 @@ all: $(NAME).o
 	@rm *.o
 
 %.o: %.asm
-	# @rm $(NAME)
+	@rm $(NAME)
 	nasm -g -f elf64 $<

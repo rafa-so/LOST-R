@@ -1,4 +1,4 @@
-; section .data
+section .data
     msg:
         db "Salve Simpatia", 10      ; 'msg' - Rótulo dos dados definido
         db "teste de definicao", 10  ; 'db'  - Os dados são definidos como
@@ -25,5 +25,5 @@ _start:                          ; Aqui está o início do programa
 
 _end:
     mov rax, 60
-    mov rdi, 0x00
+    mov rdi, 0
     syscall
