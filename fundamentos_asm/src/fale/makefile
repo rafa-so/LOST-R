@@ -1,4 +1,4 @@
-NAME=salve
+NAME=fale
 
 all: $(NAME).o
 	ld -o $(NAME) $(NAME).o
